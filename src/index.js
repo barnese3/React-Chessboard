@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Board from './components/Board';
-import { observe, piecePosition } from './components/Game';
+import Board from './Board';
+import { observe, piecePosition } from './Game';
 import registerServiceWorker from './registerServiceWorker';
 
 observe(knightPosition =>
