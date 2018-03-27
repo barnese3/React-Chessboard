@@ -2,16 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Board from './components/Board';
-import { observe } from './components/Game';
+import { observe, piecePosition } from './components/Game';
 import registerServiceWorker from './registerServiceWorker';
 
-const rootEl = document.getElementById('root');
-
 observe(knightPosition =>
-  ReactDOM.render(
-    <Board knightPosition={knightPosition} />,
-    rootEl
-  )
+	observe(bishopPosition =>
+		  ReactDOM.render(
+    		<Board bishopPosition={piecePosition[1]}
+    		knightPosition={piecePosition[0]} />,
+    		document.getElementById('root')
+ 		 )
+	)
 );
 
 registerServiceWorker();
