@@ -6,6 +6,7 @@ export let piecePosition = [
 	[2, 7] // bishop
 ];
 let observer = null;
+let fullSquares = [];
 let currentSquare;
 
 
@@ -25,7 +26,9 @@ export function observe(o) {
 export function moveKnight(toX, toY) {
   let moveFrom = findSquare(piecePosition[0][0], piecePosition[0][1]);
   moveFrom[2] = "empty";
+  fullSquares.splice(fullSquares.indexOf(moveFrom), 1);
   currentSquare[2] = "full";
+  fullSquares.push(currentSquare);
   piecePosition[0] = [toX, toY];
   observer(piecePosition[0]);
 }
@@ -34,7 +37,9 @@ export function moveKnight(toX, toY) {
 export function moveBishop(toX, toY) {
   let moveFrom = findSquare(piecePosition[1][0], piecePosition[1][1]);
   moveFrom[2] = "empty";
+  fullSquares.splice(fullSquares.indexOf(moveFrom), 1);
   currentSquare[2] = "full";
+  fullSquares.push(currentSquare);
   piecePosition[1] = [toX, toY];
   observer(piecePosition[1]);
 }
@@ -61,16 +66,16 @@ export function canMoveBishop(toX, toY) {
   let squareState = findSquare(toX, toY);
   currentSquare = squareState;
 
-  let full = getFullSquares(x, y);
-  // console.log(full);
+  // forbids bishop from jumping over pieces  -- this feature is not finished yet (almost!!)
+  getFullSquares(x, y);
+  // const a = Math.abs(toX - full[0]);
+  // const b = Math.abs(toY - full[1]);
+  // (Math.abs(a) === Math.abs(b) && squareState[2] === "empty");
 
   return (Math.abs(dx) === Math.abs(dy) && squareState[2] === "empty");
 }
 
-// check all surrounding pieces of current, if one is full, dont go past
-// and if its not in a diagnol from a full square
-// all surrounding pieces will be x+1, y-2; x+1, y+1; x-1, y-1; x-1, y+1....get coords of all surrounding pieces
-
+// checks for full square surrounding the piece you are trying to move so that you cannot jump over a piece if the rules do not permit it
 function getFullSquares(x, y) {
   let surroundingSquares = [
     [(x+1), (y-1)],
@@ -78,28 +83,27 @@ function getFullSquares(x, y) {
     [(x-1), (y-1)],
     [(x-1), (y+1)]
   ];
-    let fullSquares = [];
-    for (let i=0; i<squareStates.length; i++) {
-      if (squareStates[i][2] === "full") {
-        for (let i=0; i<surroundingSquares.length; i++){
-          console.log(squareStates[i][0]); //why is this 0?
-          if (squareStates[i][0] === surroundingSquares[i][0] && squareStates[i][1] === surroundingSquares[i][1]) {
-            fullSquares.push(surroundingSquares[i]);
+    let surroundingFullSquaresX;
+    let surroundingFullSquaresY;
+      for (let i=0; i<surroundingSquares.length; i++){
+        for (let j=0; j<fullSquares.length; j++) {
+          if (fullSquares[j][0] === surroundingSquares[i][0] && fullSquares[j][1] === surroundingSquares[i][1]) {
+            surroundingFullSquaresX = surroundingSquares[i][0];
+            surroundingFullSquaresY = surroundingSquares[i][1];
+            break;
           }
         }
       }
+    return [surroundingFullSquaresX, surroundingFullSquaresY];
   }
-  return fullSquares;
+
+// initially checks for all full squares
+function fullSqauresArray() {
+  for (let i=0; i<squareStates.length; i++) {
+    if (squareStates[i][2] === "full") {
+      fullSquares.push(squareStates[i]);
+    }
+  }
 }
 
-// function jumpPieces() {
-//   let fullSquares = [];
-//     for (let i=0; i<squareStates.length; i++) {
-//       if (squareStates[i][2] === "full") {
-//         fullSquares.push(squareStates[i]);
-//       }
-//   }
-//   return fullSquares;
-// }
-
-// keep track of all full squares without loop through all square states, in a seperate array......2,5
+fullSqauresArray();
